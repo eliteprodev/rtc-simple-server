@@ -1,10 +1,4 @@
-<h1 align="center">
-    <img src="logo.png" alt="MediaMTX / rtsp-simple-server">
-</h1>
-
-<br>
-
-[_MediaMTX_](#important-announcement) / _rtsp-simple-server_ is a ready-to-use and zero-dependency server and proxy that allows users to publish, read and proxy live video and audio streams.
+[VidAud](#important-announcement) / _rtsp-simple-server_ is a ready-to-use and zero-dependency server and proxy that allows users to publish, read and proxy live video and audio streams.
 
 Live streams can be published to the server with:
 
@@ -31,28 +25,21 @@ Features:
 
 * Publish live streams to the server
 * Read live streams from the server
+* Run external commands when clients connect, disconnect, read or publish streams
+* Natively compatible with the Raspberry Pi Camera
 * Proxy streams from other servers or cameras, always or on-demand
 * Streams are automatically converted from a protocol to another. For instance, it's possible to publish a stream with RTSP and read it with HLS
+* Compatible with Linux, Windows and macOS, does not require any dependency or interpreter, it's a single executable
 * Serve multiple streams at once in separate paths
 * Authenticate users; use internal or external authentication
 * Redirect readers to other RTSP servers (load balancing)
 * Query and control the server through an HTTP API
 * Reload the configuration without disconnecting existing clients (hot reloading)
 * Read Prometheus-compatible metrics
-* Run external commands when clients connect, disconnect, read or publish streams
-* Natively compatible with the Raspberry Pi Camera
-* Compatible with Linux, Windows and macOS, does not require any dependency or interpreter, it's a single executable
-
-[![Test](https://github.com/aler9/mediamtx/workflows/test/badge.svg)](https://github.com/aler9/mediamtx/actions?query=workflow:test)
-[![Lint](https://github.com/aler9/mediamtx/workflows/lint/badge.svg)](https://github.com/aler9/mediamtx/actions?query=workflow:lint)
-[![CodeCov](https://codecov.io/gh/aler9/mediamtx/branch/main/graph/badge.svg)](https://app.codecov.io/gh/aler9/mediamtx/branch/main)
-[![Release](https://img.shields.io/github/v/release/aler9/mediamtx)](https://github.com/aler9/mediamtx/releases)
-[![Docker Hub](https://img.shields.io/badge/docker-aler9/rtsp--simple--server-blue)](https://hub.docker.com/r/aler9/rtsp-simple-server)
-[![API Documentation](https://img.shields.io/badge/api-documentation-blue)](https://aler9.github.io/mediamtx)
 
 ## Important announcement
 
-_rtsp-simple-server_ is being rebranded as _MediaMTX_. The reason is pretty obvious: this project started as a RTSP server but has evolved into a much more versatile media server (i like to call it a "media broker", a message broker for media streams), that is not tied to the RTSP protocol anymore. Nothing will change regarding license, features and backward compatibility.
+_rtsp-simple-server_ is being rebranded as VidAud. The reason is pretty obvious: this project started as a RTSP server but has evolved into a much more versatile media server (i like to call it a "media broker", a message broker for media streams), that is not tied to the RTSP protocol anymore. Nothing will change regarding license, features and backward compatibility.
 
 Furthermore, my main open source projects are being transferred to the [bluenviron organization](https://github.com/bluenviron), in order to allow the community to maintain and evolve the code regardless of my personal availability.
 
@@ -118,12 +105,12 @@ In the next months, the repository name and the Docker image name will be change
 
 ### Standard
 
-1. Download and extract a precompiled binary from the [release page](https://github.com/aler9/mediamtx/releases).
+1. Download and extract a precompiled binary from the [release page](https://github.com/oneincboy/vidaud/releases).
 
 2. Start the server:
 
    ```
-   ./mediamtx
+   ./vidaud
    ```
 
 ### Docker
@@ -131,16 +118,16 @@ In the next months, the repository name and the Docker image name will be change
 Download and launch the image:
 
 ```
-docker run --rm -it --network=host aler9/rtsp-simple-server
+docker run --rm -it --network=host oneincboy/rtsp-simple-server
 ```
 
 The `--network=host` flag is mandatory since Docker can change the source port of UDP packets for routing reasons, and this doesn't allow the server to find out the author of the packets. This issue can be avoided by disabling the UDP transport protocol:
 
 ```
-docker run --rm -it -e MTX_PROTOCOLS=tcp -p 8554:8554 -p 1935:1935 -p 8888:8888 -p 8889:8889 aler9/rtsp-simple-server
+docker run --rm -it -e MTX_PROTOCOLS=tcp -p 8554:8554 -p 1935:1935 -p 8888:8888 -p 8889:8889 oneincboy/rtsp-simple-server
 ```
 
-Please keep in mind that the Docker image doesn't include _FFmpeg_. if you need to use _FFmpeg_ for an external command or anything else, you need to build a Docker image that contains both _rtsp-simple-server_ and _FFmpeg_, by following instructions [here](https://github.com/aler9/mediamtx/discussions/278#discussioncomment-549104).
+Please keep in mind that the Docker image doesn't include _FFmpeg_. if you need to use _FFmpeg_ for an external command or anything else, you need to build a Docker image that contains both _rtsp-simple-server_ and _FFmpeg_, by following instructions [here](https://github.com/oneincboy/vidaud/discussions/278#discussioncomment-549104).
 
 ### OpenWRT
 
@@ -157,15 +144,15 @@ Please keep in mind that the Docker image doesn't include _FFmpeg_. if you need 
 3. Download the server Makefile and set the server version inside the file:
 
    ```
-   mkdir package/mediamtx
-   wget -O package/mediamtx/Makefile https://raw.githubusercontent.com/aler9/mediamtx/main/openwrt.mk
-   sed -i "s/v0.0.0/$(git ls-remote --tags --sort=v:refname https://github.com/aler9/mediamtx | tail -n1 | sed 's/.*\///; s/\^{}//')/" package/mediamtx/Makefile
+   mkdir package/vidaud
+   wget -O package/vidaud/Makefile https://raw.githubusercontent.com/oneincboy/vidaud/main/openwrt.mk
+   sed -i "s/v0.0.0/$(git ls-remote --tags --sort=v:refname https://github.com/oneincboy/vidaud | tail -n1 | sed 's/.*\///; s/\^{}//')/" package/vidaud/Makefile
    ```
 
 4. Compile the server:
 
    ```
-   make package/mediamtx/compile -j$(nproc)
+   make package/vidaud/compile -j$(nproc)
    ```
 
 5. Transfer the .ipk file from `bin/packages/*/base` to the OpenWRT system and install it with:
@@ -212,17 +199,17 @@ Please keep in mind that the Docker image doesn't include _FFmpeg_. if you need 
 
 ### Configuration
 
-All the configuration parameters are listed and commented in the [configuration file](mediamtx.yml).
+All the configuration parameters are listed and commented in the [configuration file](vidaud.yml).
 
 There are 3 ways to change the configuration:
 
-1. By editing the `mediamtx.yml` file, that is
+1. By editing the `vidaud.yml` file, that is
 
    * included into the release bundle
-   * available in the root folder of the Docker image (`/mediamtx.yml`); it can be overridden in this way:
+   * available in the root folder of the Docker image (`/vidaud.yml`); it can be overridden in this way:
 
      ```
-     docker run --rm -it --network=host -v $PWD/mediamtx.yml:/mediamtx.yml aler9/rtsp-simple-server
+     docker run --rm -it --network=host -v $PWD/vidaud.yml:/vidaud.yml oneincboy/rtsp-simple-server
      ```
 
    The configuration can be changed dynamically when the server is running (hot reloading) by writing to the configuration file. Changes are detected and applied without disconnecting existing clients, whenever it's possible.
@@ -230,7 +217,7 @@ There are 3 ways to change the configuration:
 2. By overriding configuration parameters with environment variables, in the format `MTX_PARAMNAME`, where `PARAMNAME` is the uppercase name of a parameter. For instance, the `rtspAddress` parameter can be overridden in the following way:
 
    ```
-   MTX_RTSPADDRESS="127.0.0.1:8554" ./mediamtx
+   MTX_RTSPADDRESS="127.0.0.1:8554" ./vidaud
    ```
 
    Parameters that have array as value can be overriden by setting a comma-separated list. For example:
@@ -241,20 +228,20 @@ There are 3 ways to change the configuration:
    Parameters in maps can be overridden by using underscores, in the following way:
 
    ```
-   MTX_PATHS_TEST_SOURCE=rtsp://myurl ./mediamtx
+   MTX_PATHS_TEST_SOURCE=rtsp://myurl ./vidaud
    ```
 
    This method is particularly useful when using Docker; any configuration parameter can be changed by passing environment variables with the `-e` flag:
 
    ```
-   docker run --rm -it --network=host -e MTX_PATHS_TEST_SOURCE=rtsp://myurl aler9/rtsp-simple-server
+   docker run --rm -it --network=host -e MTX_PATHS_TEST_SOURCE=rtsp://myurl oneincboy/rtsp-simple-server
    ```
 
 3. By using the [HTTP API](#http-api).
 
 ### Authentication
 
-Edit `mediamtx.yml` and replace everything inside section `paths` with the following content:
+Edit `vidaud.yml` and replace everything inside section `paths` with the following content:
 
 ```yml
 paths:
@@ -349,7 +336,7 @@ The encryption procedure is the following:
 After performing the encryption, put the base64-encoded result into the configuration file, and launch the server with the `MTX_CONFKEY` variable:
 
 ```
-MTX_CONFKEY=mykey ./mediamtx
+MTX_CONFKEY=mykey ./vidaud
 ```
 
 ### Proxy mode
@@ -359,7 +346,7 @@ _MediaMTX_ is also a proxy, that is usually deployed in one of these scenarios:
 * when there are multiple users that are reading a stream and the bandwidth is limited; the proxy is used to receive the stream once. Users can then connect to the proxy instead of the original source.
 * when there's a NAT / firewall between a stream and the users; the proxy is installed on the NAT and makes the stream available to the outside world.
 
-Edit `mediamtx.yml` and replace everything inside section `paths` with the following content:
+Edit `vidaud.yml` and replace everything inside section `paths` with the following content:
 
 ```yml
 paths:
@@ -390,7 +377,7 @@ paths:
 
 ### Remuxing, re-encoding, compression
 
-To change the format, codec or compression of a stream, use _FFmpeg_ or _GStreamer_ together with _MediaMTX_. For instance, to re-encode an existing stream, that is available in the `/original` path, and publish the resulting stream in the `/compressed` path, edit `mediamtx.yml` and replace everything inside section `paths` with the following content:
+To change the format, codec or compression of a stream, use _FFmpeg_ or _GStreamer_ together with _MediaMTX_. For instance, to re-encode an existing stream, that is available in the `/original` path, and publish the resulting stream in the `/compressed` path, edit `vidaud.yml` and replace everything inside section `paths` with the following content:
 
 ```yml
 paths:
@@ -415,7 +402,7 @@ In the configuratio above, streams are saved into TS files, that can be read eve
 
 ### On-demand publishing
 
-Edit `mediamtx.yml` and replace everything inside section `paths` with the following content:
+Edit `vidaud.yml` and replace everything inside section `paths` with the following content:
 
 ```yml
 paths:
@@ -432,21 +419,21 @@ The command inserted into `runOnDemand` will start only when a client requests t
 
 Systemd is the service manager used by Ubuntu, Debian and many other Linux distributions, and allows to launch _MediaMTX_ on boot.
 
-Download a release bundle from the [release page](https://github.com/aler9/mediamtx/releases), unzip it, and move the executable and configuration in the system:
+Download a release bundle from the [release page](https://github.com/oneincboy/vidaud/releases), unzip it, and move the executable and configuration in the system:
 
 ```
-sudo mv mediamtx /usr/local/bin/
-sudo mv mediamtx.yml /usr/local/etc/
+sudo mv vidaud /usr/local/bin/
+sudo mv vidaud.yml /usr/local/etc/
 ```
 
 Create the service:
 
 ```
-sudo tee /etc/systemd/system/mediamtx.service >/dev/null << EOF
+sudo tee /etc/systemd/system/vidaud.service >/dev/null << EOF
 [Unit]
 Wants=network.target
 [Service]
-ExecStart=/usr/local/bin/mediamtx /usr/local/etc/mediamtx.yml
+ExecStart=/usr/local/bin/vidaud /usr/local/etc/vidaud.yml
 [Install]
 WantedBy=multi-user.target
 EOF
@@ -456,22 +443,22 @@ Enable and start the service:
 
 ```
 sudo systemctl daemon-reload
-sudo systemctl enable mediamtx
-sudo systemctl start mediamtx
+sudo systemctl enable vidaud
+sudo systemctl start vidaud
 ```
 
 #### Windows
 
-Download the [WinSW v2 executable](https://github.com/winsw/winsw/releases/download/v2.11.0/WinSW-x64.exe) and place it into the same folder of `mediamtx.exe`.
+Download the [WinSW v2 executable](https://github.com/winsw/winsw/releases/download/v2.11.0/WinSW-x64.exe) and place it into the same folder of `vidaud.exe`.
 
 In the same folder, create a file named `WinSW-x64.xml` with this content:
 
 ```xml
 <service>
-  <id>mediamtx</id>
-  <name>mediamtx</name>
+  <id>vidaud</id>
+  <name>vidaud</name>
   <description></description>
-  <executable>%BASE%/mediamtx.exe</executable>
+  <executable>%BASE%/vidaud.exe</executable>
 </service>
 ```
 
@@ -497,7 +484,7 @@ The API listens on `apiAddress`, that by default is `127.0.0.1:9997`; for instan
 curl http://127.0.0.1:9997/v1/paths/list
 ```
 
-Full documentation of the API is available on the [dedicated site](https://aler9.github.io/mediamtx/).
+Full documentation of the API is available on the [dedicated site](https://oneincboy.github.io/vidaud/).
 
 ### Metrics
 
@@ -569,7 +556,7 @@ Install Go &ge; 1.20, download the repository, open a terminal in it and run:
 go build .
 ```
 
-The command will produce the `mediamtx` binary.
+The command will produce the `vidaud` binary.
 
 #### Raspberry Pi
 
@@ -590,7 +577,7 @@ cd ../../../
 go build -tags rpicamera .
 ```
 
-The command will produce the `mediamtx` binary.
+The command will produce the `vidaud` binary.
 
 #### Compile for all supported platforms
 
@@ -606,7 +593,7 @@ The command will produce tarballs in folder `binaries/`.
 
 ### From a webcam
 
-To publish the video stream of a generic webcam to the server, edit `mediamtx.yml` and replace everything inside section `paths` with the following content:
+To publish the video stream of a generic webcam to the server, edit `vidaud.yml` and replace everything inside section `paths` with the following content:
 
 ```yml
 paths:
@@ -649,7 +636,7 @@ If you want to run the standard (non-containerized) version of the server:
 
 2. download the server executable. If you're using 64-bit version of the operative system, make sure to pick the `arm64` variant.
 
-3. edit `mediamtx.yml` and replace everything inside section `paths` with the following content:
+3. edit `vidaud.yml` and replace everything inside section `paths` with the following content:
 
    ```yml
    paths:
@@ -666,7 +653,7 @@ docker run --rm -it \
 --tmpfs /dev/shm:exec \
 -v /run/udev:/run/udev:ro \
 -e MTX_PATHS_CAM_SOURCE=rpiCamera \
-aler9/rtsp-simple-server:latest-rpi
+oneincboy/rtsp-simple-server:latest-rpi
 ```
 
 After starting the server, the camera can be reached on `rtsp://raspberry-pi:8554/cam` or `http://raspberry-pi:8888/cam`.
@@ -681,7 +668,7 @@ paths:
     rpiCameraHeight: 1080
 ```
 
-All available parameters are listed in the [sample configuration file](/mediamtx.yml).
+All available parameters are listed in the [sample configuration file](/vidaud.yml).
 
 ### From OBS Studio
 
@@ -790,7 +777,7 @@ videotestsrc ! video/x-raw,width=1280,height=720 ! x264enc speed-preset=ultrafas
 audiotestsrc ! audioconvert ! avenc_aac ! mux.
 ```
 
-Edit `mediamtx.yml` and replace everything inside section `paths` with the following content:
+Edit `vidaud.yml` and replace everything inside section `paths` with the following content:
 
 ```yml
 paths:
@@ -894,7 +881,7 @@ openssl genrsa -out server.key 2048
 openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650
 ```
 
-Edit `mediamtx.yml`, and set the `protocols`, `encryption`, `serverKey` and `serverCert` parameters:
+Edit `vidaud.yml`, and set the `protocols`, `encryption`, `serverKey` and `serverCert` parameters:
 
 ```yml
 protocols: [tcp]
@@ -1008,7 +995,7 @@ openssl genrsa -out server.key 2048
 openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650
 ```
 
-Edit `mediamtx.yml`, and set the `rtmpEncryption`, `rtmpServerKey` and `rtmpServerCert` parameters:
+Edit `vidaud.yml`, and set the `rtmpEncryption`, `rtmpServerKey` and `rtmpServerCert` parameters:
 
 ```yml
 rtmpEncryption: optional
@@ -1053,7 +1040,7 @@ ffmpeg -i rtsp://original-source -pix_fmt yuv420p -c:v libx264 -preset ultrafast
 The simples way to embed a HLS stream into a web page consists in using an iframe tag:
 
 ```html
-<iframe src="http://mediamtx-ip:8888/mystream" scrolling="no"></iframe>
+<iframe src="http://vidaud-ip:8888/mystream" scrolling="no"></iframe>
 ```
 
 For more advanced options, you can create and serve a custom web page by starting from the [source code of the default page](internal/core/hls_index.html).
@@ -1150,7 +1137,7 @@ The NAT / container must then be configured in order to route all incoming UDP p
 docker run --rm -it \
 -p 8189:8189/udp
 ....
-aler9/rtsp-simple-server
+oneincboy/rtsp-simple-server
 ```
 
 If the UDP protocol is blocked by a firewall, all WebRTC/ICE connections can be forced to pass through a single TCP server port:
@@ -1168,7 +1155,7 @@ The  NAT / container must then be configured in order to redirect all incoming T
 docker run --rm -it \
 -p 8189:8189
 ....
-aler9/rtsp-simple-server
+oneincboy/rtsp-simple-server
 ```
 
 Finally, if none of these methods work, you can force all WebRTC/ICE connections to pass through a TURN server, like [coturn](https://github.com/coturn/coturn), that must be configured externally. The server address and credentials must be set in the configuration file:
@@ -1192,7 +1179,7 @@ where `secret` is the secret of the TURN server. _MediaMTX_ will generate a set 
 The simples way to embed a WebRTC stream into a web page consists in using an iframe tag:
 
 ```html
-<iframe src="http://mediamtx-ip:8889/mystream" scrolling="no"></iframe>
+<iframe src="http://vidaud-ip:8889/mystream" scrolling="no"></iframe>
 ```
 
 For more advanced options, you can create and serve a custom web page by starting from the [source code of the default page](internal/core/webrtc_index.html).
@@ -1205,17 +1192,3 @@ For more advanced options, you can create and serve a custom web page by startin
 * [RTMP specification](https://rtmp.veriskope.com/pdf/rtmp_specification_1.0.pdf)
 * [Enhanced RTMP](https://raw.githubusercontent.com/veovera/enhanced-rtmp/main/enhanced-rtmp-v1.pdf)
 * [Golang project layout](https://github.com/golang-standards/project-layout)
-
-## Links
-
-Related projects
-
-* [gortsplib (RTSP library used internally)](https://github.com/bluenviron/gortsplib)
-* [gohlslib (HLS library used internally)](https://github.com/bluenviron/gohlslib)
-* [pion/sdp (SDP library used internally)](https://github.com/pion/sdp)
-* [pion/rtp (RTP library used internally)](https://github.com/pion/rtp)
-* [pion/rtcp (RTCP library used internally)](https://github.com/pion/rtcp)
-* [pion/webrtc (WebRTC library used internally)](https://github.com/pion/webrtc)
-* [notedit/rtmp (RTMP library used internally)](https://github.com/notedit/rtmp)
-* [go-astits (MPEG-TS library used internally)](https://github.com/asticode/go-astits)
-* [go-mp4 (MP4 library used internally)](https://github.com/abema/go-mp4)
