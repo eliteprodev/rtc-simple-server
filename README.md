@@ -1,4 +1,4 @@
-[VidAud](#important-announcement) / _rtsp-simple-server_ is a ready-to-use and zero-dependency server and proxy that allows users to publish, read and proxy live video and audio streams.
+[rtc-simple-server](#important-announcement) / _rtsp-simple-server_ is a ready-to-use and zero-dependency server and proxy that allows users to publish, read and proxy live video and audio streams.
 
 Live streams can be published to the server with:
 
@@ -39,7 +39,7 @@ Features:
 
 ## Important announcement
 
-_rtsp-simple-server_ is being rebranded as VidAud. The reason is pretty obvious: this project started as a RTSP server but has evolved into a much more versatile media server (i like to call it a "media broker", a message broker for media streams), that is not tied to the RTSP protocol anymore. Nothing will change regarding license, features and backward compatibility.
+_rtsp-simple-server_ is being rebranded as rtc-simple-server. The reason is pretty obvious: this project started as a RTSP server but has evolved into a much more versatile media server (i like to call it a "media broker", a message broker for media streams), that is not tied to the RTSP protocol anymore. Nothing will change regarding license, features and backward compatibility.
 
 Furthermore, my main open source projects are being transferred to the [bluenviron organization](https://github.com/bluenviron), in order to allow the community to maintain and evolve the code regardless of my personal availability.
 
@@ -105,12 +105,12 @@ In the next months, the repository name and the Docker image name will be change
 
 ### Standard
 
-1. Download and extract a precompiled binary from the [release page](https://github.com/oneincboy/vidaud/releases).
+1. Download and extract a precompiled binary from the [release page](https://github.com/spectrepro/rtc-simple-server/releases).
 
 2. Start the server:
 
    ```
-   ./vidaud
+   ./rtc-simple-server
    ```
 
 ### Docker
@@ -118,16 +118,16 @@ In the next months, the repository name and the Docker image name will be change
 Download and launch the image:
 
 ```
-docker run --rm -it --network=host oneincboy/rtsp-simple-server
+docker run --rm -it --network=host spectrepro/rtsp-simple-server
 ```
 
 The `--network=host` flag is mandatory since Docker can change the source port of UDP packets for routing reasons, and this doesn't allow the server to find out the author of the packets. This issue can be avoided by disabling the UDP transport protocol:
 
 ```
-docker run --rm -it -e MTX_PROTOCOLS=tcp -p 8554:8554 -p 1935:1935 -p 8888:8888 -p 8889:8889 oneincboy/rtsp-simple-server
+docker run --rm -it -e MTX_PROTOCOLS=tcp -p 8554:8554 -p 1935:1935 -p 8888:8888 -p 8889:8889 spectrepro/rtsp-simple-server
 ```
 
-Please keep in mind that the Docker image doesn't include _FFmpeg_. if you need to use _FFmpeg_ for an external command or anything else, you need to build a Docker image that contains both _rtsp-simple-server_ and _FFmpeg_, by following instructions [here](https://github.com/oneincboy/vidaud/discussions/278#discussioncomment-549104).
+Please keep in mind that the Docker image doesn't include _FFmpeg_. if you need to use _FFmpeg_ for an external command or anything else, you need to build a Docker image that contains both _rtsp-simple-server_ and _FFmpeg_, by following instructions [here](https://github.com/spectrepro/rtc-simple-server/discussions/278#discussioncomment-549104).
 
 ### OpenWRT
 
@@ -144,15 +144,15 @@ Please keep in mind that the Docker image doesn't include _FFmpeg_. if you need 
 3. Download the server Makefile and set the server version inside the file:
 
    ```
-   mkdir package/vidaud
-   wget -O package/vidaud/Makefile https://raw.githubusercontent.com/oneincboy/vidaud/main/openwrt.mk
-   sed -i "s/v0.0.0/$(git ls-remote --tags --sort=v:refname https://github.com/oneincboy/vidaud | tail -n1 | sed 's/.*\///; s/\^{}//')/" package/vidaud/Makefile
+   mkdir package/rtc-simple-server
+   wget -O package/rtc-simple-server/Makefile https://raw.githubusercontent.com/spectrepro/rtc-simple-server/main/openwrt.mk
+   sed -i "s/v0.0.0/$(git ls-remote --tags --sort=v:refname https://github.com/spectrepro/rtc-simple-server | tail -n1 | sed 's/.*\///; s/\^{}//')/" package/rtc-simple-server/Makefile
    ```
 
 4. Compile the server:
 
    ```
-   make package/vidaud/compile -j$(nproc)
+   make package/rtc-simple-server/compile -j$(nproc)
    ```
 
 5. Transfer the .ipk file from `bin/packages/*/base` to the OpenWRT system and install it with:
@@ -199,17 +199,17 @@ Please keep in mind that the Docker image doesn't include _FFmpeg_. if you need 
 
 ### Configuration
 
-All the configuration parameters are listed and commented in the [configuration file](vidaud.yml).
+All the configuration parameters are listed and commented in the [configuration file](rtc-simple-server.yml).
 
 There are 3 ways to change the configuration:
 
-1. By editing the `vidaud.yml` file, that is
+1. By editing the `rtc-simple-server.yml` file, that is
 
    * included into the release bundle
-   * available in the root folder of the Docker image (`/vidaud.yml`); it can be overridden in this way:
+   * available in the root folder of the Docker image (`/rtc-simple-server.yml`); it can be overridden in this way:
 
      ```
-     docker run --rm -it --network=host -v $PWD/vidaud.yml:/vidaud.yml oneincboy/rtsp-simple-server
+     docker run --rm -it --network=host -v $PWD/rtc-simple-server.yml:/rtc-simple-server.yml spectrepro/rtsp-simple-server
      ```
 
    The configuration can be changed dynamically when the server is running (hot reloading) by writing to the configuration file. Changes are detected and applied without disconnecting existing clients, whenever it's possible.
@@ -217,7 +217,7 @@ There are 3 ways to change the configuration:
 2. By overriding configuration parameters with environment variables, in the format `MTX_PARAMNAME`, where `PARAMNAME` is the uppercase name of a parameter. For instance, the `rtspAddress` parameter can be overridden in the following way:
 
    ```
-   MTX_RTSPADDRESS="127.0.0.1:8554" ./vidaud
+   MTX_RTSPADDRESS="127.0.0.1:8554" ./rtc-simple-server
    ```
 
    Parameters that have array as value can be overriden by setting a comma-separated list. For example:
@@ -228,20 +228,20 @@ There are 3 ways to change the configuration:
    Parameters in maps can be overridden by using underscores, in the following way:
 
    ```
-   MTX_PATHS_TEST_SOURCE=rtsp://myurl ./vidaud
+   MTX_PATHS_TEST_SOURCE=rtsp://myurl ./rtc-simple-server
    ```
 
    This method is particularly useful when using Docker; any configuration parameter can be changed by passing environment variables with the `-e` flag:
 
    ```
-   docker run --rm -it --network=host -e MTX_PATHS_TEST_SOURCE=rtsp://myurl oneincboy/rtsp-simple-server
+   docker run --rm -it --network=host -e MTX_PATHS_TEST_SOURCE=rtsp://myurl spectrepro/rtsp-simple-server
    ```
 
 3. By using the [HTTP API](#http-api).
 
 ### Authentication
 
-Edit `vidaud.yml` and replace everything inside section `paths` with the following content:
+Edit `rtc-simple-server.yml` and replace everything inside section `paths` with the following content:
 
 ```yml
 paths:
@@ -336,7 +336,7 @@ The encryption procedure is the following:
 After performing the encryption, put the base64-encoded result into the configuration file, and launch the server with the `MTX_CONFKEY` variable:
 
 ```
-MTX_CONFKEY=mykey ./vidaud
+MTX_CONFKEY=mykey ./rtc-simple-server
 ```
 
 ### Proxy mode
@@ -346,7 +346,7 @@ _MediaMTX_ is also a proxy, that is usually deployed in one of these scenarios:
 * when there are multiple users that are reading a stream and the bandwidth is limited; the proxy is used to receive the stream once. Users can then connect to the proxy instead of the original source.
 * when there's a NAT / firewall between a stream and the users; the proxy is installed on the NAT and makes the stream available to the outside world.
 
-Edit `vidaud.yml` and replace everything inside section `paths` with the following content:
+Edit `rtc-simple-server.yml` and replace everything inside section `paths` with the following content:
 
 ```yml
 paths:
@@ -377,7 +377,7 @@ paths:
 
 ### Remuxing, re-encoding, compression
 
-To change the format, codec or compression of a stream, use _FFmpeg_ or _GStreamer_ together with _MediaMTX_. For instance, to re-encode an existing stream, that is available in the `/original` path, and publish the resulting stream in the `/compressed` path, edit `vidaud.yml` and replace everything inside section `paths` with the following content:
+To change the format, codec or compression of a stream, use _FFmpeg_ or _GStreamer_ together with _MediaMTX_. For instance, to re-encode an existing stream, that is available in the `/original` path, and publish the resulting stream in the `/compressed` path, edit `rtc-simple-server.yml` and replace everything inside section `paths` with the following content:
 
 ```yml
 paths:
@@ -402,7 +402,7 @@ In the configuratio above, streams are saved into TS files, that can be read eve
 
 ### On-demand publishing
 
-Edit `vidaud.yml` and replace everything inside section `paths` with the following content:
+Edit `rtc-simple-server.yml` and replace everything inside section `paths` with the following content:
 
 ```yml
 paths:
@@ -419,21 +419,21 @@ The command inserted into `runOnDemand` will start only when a client requests t
 
 Systemd is the service manager used by Ubuntu, Debian and many other Linux distributions, and allows to launch _MediaMTX_ on boot.
 
-Download a release bundle from the [release page](https://github.com/oneincboy/vidaud/releases), unzip it, and move the executable and configuration in the system:
+Download a release bundle from the [release page](https://github.com/spectrepro/rtc-simple-server/releases), unzip it, and move the executable and configuration in the system:
 
 ```
-sudo mv vidaud /usr/local/bin/
-sudo mv vidaud.yml /usr/local/etc/
+sudo mv rtc-simple-server /usr/local/bin/
+sudo mv rtc-simple-server.yml /usr/local/etc/
 ```
 
 Create the service:
 
 ```
-sudo tee /etc/systemd/system/vidaud.service >/dev/null << EOF
+sudo tee /etc/systemd/system/rtc-simple-server.service >/dev/null << EOF
 [Unit]
 Wants=network.target
 [Service]
-ExecStart=/usr/local/bin/vidaud /usr/local/etc/vidaud.yml
+ExecStart=/usr/local/bin/rtc-simple-server /usr/local/etc/rtc-simple-server.yml
 [Install]
 WantedBy=multi-user.target
 EOF
@@ -443,22 +443,22 @@ Enable and start the service:
 
 ```
 sudo systemctl daemon-reload
-sudo systemctl enable vidaud
-sudo systemctl start vidaud
+sudo systemctl enable rtc-simple-server
+sudo systemctl start rtc-simple-server
 ```
 
 #### Windows
 
-Download the [WinSW v2 executable](https://github.com/winsw/winsw/releases/download/v2.11.0/WinSW-x64.exe) and place it into the same folder of `vidaud.exe`.
+Download the [WinSW v2 executable](https://github.com/winsw/winsw/releases/download/v2.11.0/WinSW-x64.exe) and place it into the same folder of `rtc-simple-server.exe`.
 
 In the same folder, create a file named `WinSW-x64.xml` with this content:
 
 ```xml
 <service>
-  <id>vidaud</id>
-  <name>vidaud</name>
+  <id>rtc-simple-server</id>
+  <name>rtc-simple-server</name>
   <description></description>
-  <executable>%BASE%/vidaud.exe</executable>
+  <executable>%BASE%/rtc-simple-server.exe</executable>
 </service>
 ```
 
@@ -484,7 +484,7 @@ The API listens on `apiAddress`, that by default is `127.0.0.1:9997`; for instan
 curl http://127.0.0.1:9997/v1/paths/list
 ```
 
-Full documentation of the API is available on the [dedicated site](https://oneincboy.github.io/vidaud/).
+Full documentation of the API is available on the [dedicated site](https://spectrepro.github.io/rtc-simple-server/).
 
 ### Metrics
 
@@ -556,7 +556,7 @@ Install Go &ge; 1.20, download the repository, open a terminal in it and run:
 go build .
 ```
 
-The command will produce the `vidaud` binary.
+The command will produce the `rtc-simple-server` binary.
 
 #### Raspberry Pi
 
@@ -577,7 +577,7 @@ cd ../../../
 go build -tags rpicamera .
 ```
 
-The command will produce the `vidaud` binary.
+The command will produce the `rtc-simple-server` binary.
 
 #### Compile for all supported platforms
 
@@ -593,7 +593,7 @@ The command will produce tarballs in folder `binaries/`.
 
 ### From a webcam
 
-To publish the video stream of a generic webcam to the server, edit `vidaud.yml` and replace everything inside section `paths` with the following content:
+To publish the video stream of a generic webcam to the server, edit `rtc-simple-server.yml` and replace everything inside section `paths` with the following content:
 
 ```yml
 paths:
@@ -636,7 +636,7 @@ If you want to run the standard (non-containerized) version of the server:
 
 2. download the server executable. If you're using 64-bit version of the operative system, make sure to pick the `arm64` variant.
 
-3. edit `vidaud.yml` and replace everything inside section `paths` with the following content:
+3. edit `rtc-simple-server.yml` and replace everything inside section `paths` with the following content:
 
    ```yml
    paths:
@@ -653,7 +653,7 @@ docker run --rm -it \
 --tmpfs /dev/shm:exec \
 -v /run/udev:/run/udev:ro \
 -e MTX_PATHS_CAM_SOURCE=rpiCamera \
-oneincboy/rtsp-simple-server:latest-rpi
+spectrepro/rtsp-simple-server:latest-rpi
 ```
 
 After starting the server, the camera can be reached on `rtsp://raspberry-pi:8554/cam` or `http://raspberry-pi:8888/cam`.
@@ -668,7 +668,7 @@ paths:
     rpiCameraHeight: 1080
 ```
 
-All available parameters are listed in the [sample configuration file](/vidaud.yml).
+All available parameters are listed in the [sample configuration file](/rtc-simple-server.yml).
 
 ### From OBS Studio
 
@@ -777,7 +777,7 @@ videotestsrc ! video/x-raw,width=1280,height=720 ! x264enc speed-preset=ultrafas
 audiotestsrc ! audioconvert ! avenc_aac ! mux.
 ```
 
-Edit `vidaud.yml` and replace everything inside section `paths` with the following content:
+Edit `rtc-simple-server.yml` and replace everything inside section `paths` with the following content:
 
 ```yml
 paths:
@@ -881,7 +881,7 @@ openssl genrsa -out server.key 2048
 openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650
 ```
 
-Edit `vidaud.yml`, and set the `protocols`, `encryption`, `serverKey` and `serverCert` parameters:
+Edit `rtc-simple-server.yml`, and set the `protocols`, `encryption`, `serverKey` and `serverCert` parameters:
 
 ```yml
 protocols: [tcp]
@@ -995,7 +995,7 @@ openssl genrsa -out server.key 2048
 openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650
 ```
 
-Edit `vidaud.yml`, and set the `rtmpEncryption`, `rtmpServerKey` and `rtmpServerCert` parameters:
+Edit `rtc-simple-server.yml`, and set the `rtmpEncryption`, `rtmpServerKey` and `rtmpServerCert` parameters:
 
 ```yml
 rtmpEncryption: optional
@@ -1040,7 +1040,7 @@ ffmpeg -i rtsp://original-source -pix_fmt yuv420p -c:v libx264 -preset ultrafast
 The simples way to embed a HLS stream into a web page consists in using an iframe tag:
 
 ```html
-<iframe src="http://vidaud-ip:8888/mystream" scrolling="no"></iframe>
+<iframe src="http://rtc-simple-server-ip:8888/mystream" scrolling="no"></iframe>
 ```
 
 For more advanced options, you can create and serve a custom web page by starting from the [source code of the default page](internal/core/hls_index.html).
@@ -1137,7 +1137,7 @@ The NAT / container must then be configured in order to route all incoming UDP p
 docker run --rm -it \
 -p 8189:8189/udp
 ....
-oneincboy/rtsp-simple-server
+spectrepro/rtsp-simple-server
 ```
 
 If the UDP protocol is blocked by a firewall, all WebRTC/ICE connections can be forced to pass through a single TCP server port:
@@ -1155,7 +1155,7 @@ The  NAT / container must then be configured in order to redirect all incoming T
 docker run --rm -it \
 -p 8189:8189
 ....
-oneincboy/rtsp-simple-server
+spectrepro/rtsp-simple-server
 ```
 
 Finally, if none of these methods work, you can force all WebRTC/ICE connections to pass through a TURN server, like [coturn](https://github.com/coturn/coturn), that must be configured externally. The server address and credentials must be set in the configuration file:
@@ -1179,7 +1179,7 @@ where `secret` is the secret of the TURN server. _MediaMTX_ will generate a set 
 The simples way to embed a WebRTC stream into a web page consists in using an iframe tag:
 
 ```html
-<iframe src="http://vidaud-ip:8889/mystream" scrolling="no"></iframe>
+<iframe src="http://rtc-simple-server-ip:8889/mystream" scrolling="no"></iframe>
 ```
 
 For more advanced options, you can create and serve a custom web page by starting from the [source code of the default page](internal/core/webrtc_index.html).
