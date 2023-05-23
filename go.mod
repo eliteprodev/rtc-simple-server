@@ -7,7 +7,7 @@ require (
 	github.com/abema/go-mp4 v0.10.1
 	github.com/alecthomas/kong v0.7.1
 	github.com/asticode/go-astits v1.11.0
-	github.com/bluenviron/gohlslib v0.2.3
+	github.com/bluenviron/gohlslib v0.2.5
 	github.com/bluenviron/gortsplib/v3 v3.5.0
 	github.com/bluenviron/mediacommon v0.5.0
 	github.com/fsnotify/fsnotify v1.6.0
@@ -21,7 +21,7 @@ require (
 	github.com/pion/interceptor v0.1.16
 	github.com/pion/rtp v1.7.13
 	github.com/pion/webrtc/v3 v3.2.1
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.3
 	golang.org/x/crypto v0.8.0
 	golang.org/x/net v0.9.0
 	gopkg.in/yaml.v2 v2.4.0
